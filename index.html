@@ -31,7 +31,23 @@ body{background:#F2F4F6;color:#191F28;-webkit-tap-highlight-color:transparent}
 .segment-wrap{display:flex;gap:8px;background:#F2F4F6;padding:4px;border-radius:14px}
 .segment-btn{flex:1;padding:12px 8px;border-radius:11px;font-size:15px;font-weight:600;color:#4E5968;background:transparent;border:none;cursor:pointer;font-family:inherit;transition:all .2s}
 .segment-btn.active{background:#fff;color:#3182F6;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.chart-bar,.chart-col{transition:width .65s cubic-bezier(.32,.72,0,1),height .65s cubic-bezier(.32,.72,0,1)}
+.chart-col{height:0;transition:height .75s cubic-bezier(.32,.72,0,1)}
+.chart-line-stroke{transition:stroke-dashoffset 1.05s cubic-bezier(.32,.72,0,1)}
+.chart-line-area{opacity:0;transition:opacity .65s ease .25s}
+.chart-line-area.is-in{opacity:1}
+.chart-dot{opacity:0;transform:scale(.4);transform-origin:center;transition:opacity .35s ease,transform .45s cubic-bezier(.32,.72,0,1)}
+.chart-dot.is-in{opacity:1;transform:scale(1)}
+.chart-bar-label{opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease}
+.chart-bar-label.is-in{opacity:1;transform:translateY(0)}
+@keyframes dashFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.dash-anim{opacity:0}
+.dash-anim.is-in{animation:dashFadeUp .55s cubic-bezier(.32,.72,0,1) forwards}
+.dash-hero{animation:dashFadeUp .5s cubic-bezier(.32,.72,0,1) forwards}
+@media (prefers-reduced-motion:reduce){
+.chart-col,.chart-line-stroke,.chart-line-area,.chart-dot,.chart-bar-label,.dash-anim,.dash-hero{animation:none!important;transition:none!important}
+.chart-col{height:var(--chart-h,auto)!important}
+.chart-line-area,.chart-dot,.chart-bar-label,.dash-anim{opacity:1!important;transform:none!important}
+}
 .bottom-nav{
 position:fixed;bottom:0;left:0;right:0;z:40;
 padding:0 16px calc(env(safe-area-inset-bottom,0) + 10px);
@@ -117,13 +133,13 @@ body.sheet-open{overflow:hidden}
 <span class="nav-icon-wrap"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z"/></svg></span>
 <span class="nav-label">홈</span>
 </button>
-<button type="button" data-view="players" class="nav-btn">
-<span class="nav-icon-wrap"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="9" cy="7" r="3.5"/><path d="M3 20v-1.5a5.5 5.5 0 0 1 5.5-5.5H10"/><circle cx="17" cy="8" r="2.5"/><path d="M15 20v-1.2a4 4 0 0 1 4-4h.5"/></svg></span>
-<span class="nav-label">회원</span>
-</button>
 <button type="button" data-view="calendar" class="nav-btn">
 <span class="nav-icon-wrap"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 11h16"/></svg></span>
 <span class="nav-label">스케줄</span>
+</button>
+<button type="button" data-view="players" class="nav-btn">
+<span class="nav-icon-wrap"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="9" cy="7" r="3.5"/><path d="M3 20v-1.5a5.5 5.5 0 0 1 5.5-5.5H10"/><circle cx="17" cy="8" r="2.5"/><path d="M15 20v-1.2a4 4 0 0 1 4-4h.5"/></svg></span>
+<span class="nav-label">회원</span>
 </button>
 </div>
 </nav>
@@ -318,6 +334,17 @@ return remainingAtDate(p,end)>0;
 function getMonthlyActiveMembers(){
 return getLastMonths(6).map(m=>({...m,count:state.players.filter(p=>isMaintainedInMonth(p,m.ym)).length}));
 }
+function firstPaymentDate(p){
+const d=(p.payment_history||[]).map(h=>h.date).filter(Boolean).sort();
+return d[0]||null;
+}
+function isNewRegistrationInMonth(p,ym){
+const first=firstPaymentDate(p);
+return !!(first&&first.slice(0,7)===ym);
+}
+function getMonthlyNewMembers(){
+return getLastMonths(6).map(m=>({...m,count:state.players.filter(p=>isNewRegistrationInMonth(p,m.ym)).length}));
+}
 function getLastMonths(n){
 const arr=[];
 const now=new Date();
@@ -334,56 +361,79 @@ count:state.schedules.filter(s=>s.status==='completed'&&s.date.slice(0,7)===m.ym
 }));
 }
 
-function renderActiveLineChart(active){
-const W=300,H=130,padL=16,padR=16,padT=20,padB=8;
-const plotW=W-padL-padR,plotH=H-padT-padB;
-const max=Math.max(...active.map(m=>m.count),1);
-const pts=active.map((m,i)=>{
-const x=padL+(active.length>1?i/(active.length-1):0.5)*plotW;
+const CHART_MAINTAIN='#3182F6';
+const CHART_NEW='#0D9B6E';
+function memberChartPts(data,max,W,padL,padR,padT,plotH){
+const plotW=W-padL-padR;
+return data.map((m,i)=>{
+const x=padL+(data.length>1?i/(data.length-1):0.5)*plotW;
 const y=padT+plotH-(m.count/max)*plotH;
 return{x,y,count:m.count};
 });
-const line=pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+}
+function memberChartArea(pts,base){
+return pts.length?`M ${pts[0].x} ${pts[0].y} ${pts.slice(1).map(p=>`L ${p.x} ${p.y}`).join(' ')} L ${pts[pts.length-1].x} ${base} L ${pts[0].x} ${base} Z`:'';
+}
+function renderMemberTrendChart(active,newly){
+const W=300,H=148,padL=16,padR=16,padT=22,padB=14;
+const plotH=H-padT-padB;
+const max=Math.max(...active.map(m=>m.count),...newly.map(m=>m.count),1);
+const mPts=memberChartPts(active,max,W,padL,padR,padT,plotH);
+const nPts=memberChartPts(newly,max,W,padL,padR,padT,plotH);
 const base=padT+plotH;
-const area=pts.length?`M ${pts[0].x} ${pts[0].y} ${pts.slice(1).map(p=>`L ${p.x} ${p.y}`).join(' ')} L ${pts[pts.length-1].x} ${base} L ${pts[0].x} ${base} Z`:'';
+const mLine=mPts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+const nLine=nPts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+const dot=(p,i,color,delayBase,labelY,labelFill)=>`<circle class="chart-dot" style="transition-delay:${delayBase+i*.07}s" cx="${p.x}" cy="${p.y}" r="4" fill="#fff" stroke="${color}" stroke-width="2.5"/><text class="chart-dot" style="transition-delay:${delayBase+.05+i*.07}s" x="${p.x}" y="${labelY}" text-anchor="middle" fill="${labelFill}" font-size="10" font-weight="700">${p.count}</text>`;
 return`<svg viewBox="0 0 ${W} ${H}" class="w-full chart-line" aria-hidden="true">
-${area?`<path d="${area}" fill="#3182F6" fill-opacity="0.1"/>`:''}
-<polyline points="${line}" fill="none" stroke="#3182F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#fff" stroke="#3182F6" stroke-width="2.5"/>`).join('')}
-${pts.map(p=>`<text x="${p.x}" y="${Math.max(p.y-10,12)}" text-anchor="middle" fill="#191F28" font-size="11" font-weight="700">${p.count}</text>`).join('')}
+<path class="chart-line-area" d="${memberChartArea(mPts,base)}" fill="${CHART_MAINTAIN}" fill-opacity="0.1"/>
+<path class="chart-line-area chart-line-area--new" d="${memberChartArea(nPts,base)}" fill="${CHART_NEW}" fill-opacity="0.12"/>
+<polyline class="chart-line-stroke" points="${mLine}" fill="none" stroke="${CHART_MAINTAIN}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline class="chart-line-stroke chart-line-stroke--new" points="${nLine}" fill="none" stroke="${CHART_NEW}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+${mPts.map((p,i)=>dot(p,i,CHART_MAINTAIN,.45,Math.max(p.y-9,11),CHART_MAINTAIN)).join('')}
+${nPts.map((p,i)=>dot(p,i,CHART_NEW,.58,Math.min(p.y+16,H-4),CHART_NEW)).join('')}
 </svg>
 <div class="flex justify-between mt-2 px-1">${active.map(m=>`<span class="text-[11px] text-toss-muted flex-1 text-center">${m.label}</span>`).join('')}</div>`;
 }
 
 function renderCharts(){
 const active=getMonthlyActiveMembers();
+const newly=getMonthlyNewMembers();
 const monthly=getMonthlyLessons();
 const maxMonth=Math.max(...monthly.map(m=>m.count),1);
 const currentActive=active.length?active[active.length-1].count:0;
+const currentNew=newly.length?newly[newly.length-1].count:0;
 
 if(!state.players.length)return`<div class="toss-card p-8 text-center text-toss-muted text-sm">회원을 등록하면 통계가 표시됩니다</div>`;
 
 return`
-<section class="space-y-4">
-<h2 class="text-lg font-bold">통계 분석</h2>
+<section class="space-y-4 dash-charts">
+<h2 class="text-lg font-bold dash-anim">통계 분석</h2>
 
-<div class="toss-card p-5">
-<p class="text-sm font-semibold text-toss-text mb-1">월별 유지 회원 수</p>
-<p class="text-xs text-toss-muted mb-1">잔여 회차가 1회 이상인 회원 · 최근 6개월</p>
-<p class="text-2xl font-bold text-toss-blue mb-3">이번 달 <span class="text-toss-text">${currentActive}</span><span class="text-base font-medium text-toss-muted ml-1">명</span></p>
-${renderActiveLineChart(active)}
+<div class="toss-card p-5 dash-anim">
+<p class="text-sm font-semibold text-toss-text mb-1">월별 회원 추이</p>
+<p class="text-xs text-toss-muted mb-2">유지: 잔여 1회 이상 · 신규: 첫 결제 월 · 최근 6개월</p>
+<div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-2">
+<p class="text-xl font-bold"><span class="text-toss-blue">유지</span> <span class="text-toss-text dash-count" data-count="${currentActive}">0</span><span class="text-sm font-medium text-toss-muted ml-0.5">명</span></p>
+<p class="text-xl font-bold"><span style="color:${CHART_NEW}">신규</span> <span class="text-toss-text dash-count-new" data-count="${currentNew}">0</span><span class="text-sm font-medium text-toss-muted ml-0.5">명</span></p>
+</div>
+<div class="flex gap-4 mb-3 text-[11px] text-toss-sub font-medium">
+<span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${CHART_MAINTAIN}"></span>유지 회원</span>
+<span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${CHART_NEW}"></span>신규 등록</span>
+</div>
+${renderMemberTrendChart(active,newly)}
 </div>
 
-<div class="toss-card p-5">
+<div class="toss-card p-5 dash-anim">
 <p class="text-sm font-semibold text-toss-text mb-1">월별 레슨 차감 현황</p>
 <p class="text-xs text-toss-muted mb-5">최근 4개월 완료 레슨</p>
 <div class="flex items-end justify-between gap-2 h-36 px-1">
-${monthly.map(m=>{
+${monthly.map((m,i)=>{
 const h=maxMonth?Math.round(m.count/maxMonth*100):0;
+const pct=Math.max(h,4);
 return`<div class="flex-1 flex flex-col items-center gap-2 min-w-0">
-<div class="w-full flex items-end justify-center h-28"><div class="chart-col w-[70%] max-w-[40px] rounded-t-xl bg-[#3182F6]" style="height:${Math.max(h,4)}%"></div></div>
-<p class="text-xs font-bold text-toss-text">${m.count}</p>
-<p class="text-[11px] text-toss-muted">${m.label}</p>
+<div class="w-full flex items-end justify-center h-28"><div class="chart-col w-[70%] max-w-[40px] rounded-t-xl bg-[#3182F6]" data-h="${pct}" data-i="${i}"></div></div>
+<p class="text-xs font-bold text-toss-text chart-bar-label" data-i="${i}">${m.count}</p>
+<p class="text-[11px] text-toss-muted chart-bar-label" data-i="${i}l">${m.label}</p>
 </div>`;
 }).join('')}
 </div>
@@ -407,7 +457,88 @@ fab.onclick=()=>{if(v==='players')openSheet('player');else openSheet('schedule',
 render();
 }
 
-function render(){renderStats();renderAlerts();renderHome();renderPlayers();renderCalendar();}
+function render(){renderStats();renderAlerts();renderHome();renderPlayers();renderCalendar();if(currentView==='home')scheduleDashboardAnimations();}
+
+let dashAnimToken=0;
+const prefersReducedMotion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function easeOutCubic(t){return 1-Math.pow(1-t,3);}
+function animateCountEl(el,to,duration,formatter){
+const unit=el.dataset.unit||'';
+const fmt=formatter||(n=>String(n));
+if(prefersReducedMotion()){el.textContent=fmt(to);return;}
+const t0=performance.now();
+function frame(now){
+const p=Math.min(1,(now-t0)/duration);
+const v=Math.round(to*easeOutCubic(p));
+el.textContent=fmt(v)+(unit?unit:'');
+if(p<1)requestAnimationFrame(frame);
+else el.textContent=fmt(to)+(unit?unit:'');
+}
+requestAnimationFrame(frame);
+}
+function scheduleDashboardAnimations(){
+const token=++dashAnimToken;
+requestAnimationFrame(()=>requestAnimationFrame(()=>{
+if(token!==dashAnimToken||currentView!=='home')return;
+runDashboardAnimations();
+}));
+}
+function runDashboardAnimations(){
+const reduced=prefersReducedMotion();
+document.querySelectorAll('#statsSection .dash-stat-value[data-count]').forEach((el,i)=>{
+const to=+el.dataset.count||0;
+const fmt=el.dataset.fmt==='deposit'?(n=>formatDeposit(n)):(n=>String(n));
+const unitEl=el.querySelector('.dash-stat-unit');
+const unit=unitEl?unitEl.outerHTML:'';
+if(reduced){el.innerHTML=fmt(to)+unit;return;}
+setTimeout(()=>{
+const t0=performance.now();
+const dur=850;
+function frame(now){
+const p=Math.min(1,(now-t0)/dur);
+const v=Math.round(to*easeOutCubic(p));
+el.innerHTML=fmt(v)+unit;
+if(p<1)requestAnimationFrame(frame);
+else el.innerHTML=fmt(to)+unit;
+}
+requestAnimationFrame(frame);
+},80+i*70);
+});
+document.querySelectorAll('.dash-count[data-count],.dash-count-new[data-count]').forEach(el=>{
+animateCountEl(el,+el.dataset.count||0,900);
+});
+document.querySelectorAll('.dash-charts .dash-anim').forEach((el,i)=>{
+if(reduced){el.classList.add('is-in');return;}
+setTimeout(()=>el.classList.add('is-in'),100+i*90);
+});
+document.querySelectorAll('.chart-line-stroke').forEach((stroke,i)=>{
+if(reduced){stroke.style.strokeDashoffset='0';return;}
+const len=stroke.getTotalLength();
+stroke.style.strokeDasharray=len;
+stroke.style.strokeDashoffset=len;
+stroke.getBoundingClientRect();
+setTimeout(()=>{stroke.style.strokeDashoffset='0';},i*200);
+});
+if(reduced){
+document.querySelectorAll('.chart-line-area,.chart-dot').forEach(el=>el.classList.add('is-in'));
+}else{
+document.querySelectorAll('.chart-line-area').forEach((area,i)=>{
+setTimeout(()=>area.classList.add('is-in'),300+i*180);
+});
+setTimeout(()=>document.querySelectorAll('.chart-dot').forEach(d=>d.classList.add('is-in')),480);
+}
+document.querySelectorAll('.chart-col[data-h]').forEach(el=>{
+const h=el.dataset.h;
+if(reduced){el.style.height=h+'%';el.style.setProperty('--chart-h',h+'%');return;}
+const delay=180+(+el.dataset.i||0)*100;
+setTimeout(()=>{el.style.height=h+'%';},delay);
+});
+document.querySelectorAll('.chart-bar-label').forEach(el=>{
+if(reduced){el.classList.add('is-in');return;}
+const i=parseFloat(el.dataset.i)||0;
+setTimeout(()=>el.classList.add('is-in'),520+i*100);
+});
+}
 
 const DASH_SVG={
 users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="9" cy="7" r="3.5"/><path d="M3 20v-1.5A5.5 5.5 0 0 1 8.5 13H10"/><circle cx="17" cy="8" r="2.5"/><path d="M15 20v-1.2a4 4 0 0 1 4-4h.5"/></svg>',
@@ -423,7 +554,8 @@ return n.toLocaleString('ko-KR');
 function dashStat(type,label,value,unit){
 const icons={registered:'users',lesson:'lesson',lessons:'check',deposit:'won'};
 const iconCls=type==='registered'?'dash-stat-icon':`dash-stat-icon dash-stat-icon--${type}`;
-return`<div class="dash-stat"><span class="${iconCls}">${DASH_SVG[icons[type]]}</span><div class="min-w-0 flex-1"><p class="dash-stat-label">${label}</p><p class="dash-stat-value">${value}<span class="dash-stat-unit">${unit}</span></p></div></div>`;
+const fmt=type==='deposit'?'deposit':'plain';
+return`<div class="dash-stat"><span class="${iconCls}">${DASH_SVG[icons[type]]}</span><div class="min-w-0 flex-1"><p class="dash-stat-label">${label}</p><p class="dash-stat-value" data-count="${value}" data-fmt="${fmt}"><span class="dash-stat-num">0</span><span class="dash-stat-unit">${unit}</span></p></div></div>`;
 }
 function renderStats(){
 const now=new Date();
@@ -445,7 +577,7 @@ document.getElementById('statsSection').innerHTML=`
 ${dashStat('registered','등록 회원',registered,'명')}
 ${dashStat('lesson','레슨 회원',lessonMembers,'명')}
 ${dashStat('lessons','총 레슨',totalLessons,'회')}
-${dashStat('deposit','총 입금액',formatDeposit(totalDeposits),'원')}
+${dashStat('deposit','총 입금액',totalDeposits,'원')}
 </div>
 </article>`;
 if(currentView==='home')startDashClock();
@@ -484,7 +616,7 @@ function listCard(p){return`<button type="button" onclick="openSheet('detail','$
 <div class="flex flex-wrap items-center gap-2 mb-1"><h3 class="font-bold text-[17px]">${esc(p.name)}</h3>${profileBadge(p)}${badge(p)}</div>
 ${p.affiliation?`<p class="text-sm text-toss-sub mb-3">${esc(p.affiliation)}</p>`:'<div class="mb-2"></div>'}
 <div class="grid grid-cols-4 gap-1 text-center">
-<div><p class="text-[10px] text-toss-muted mb-1">누적 결제</p><p class="text-xs font-bold">${shortMoney(p.total_paid)}</p></div>
+<div><p class="text-[10px] text-toss-muted mb-1">누적 결제</p><p class="text-sm font-bold">${shortMoney(p.total_paid)}</p></div>
 <div><p class="text-[10px] text-toss-muted mb-1">충전</p><p class="text-sm font-bold">${p.total_sessions}회</p></div>
 <div><p class="text-[10px] text-toss-muted mb-1">사용</p><p class="text-sm font-bold">${p.used_sessions}회</p></div>
 <div><p class="text-[10px] text-toss-muted mb-1">잔여</p><p class="text-sm font-bold text-toss-blue">${p.remaining_sessions}회</p></div></div></button>`;}
@@ -670,7 +802,7 @@ document.getElementById('sheet').innerHTML=`<div class="w-10 h-1 bg-gray-200 rou
 ${p.affiliation?`<p class="text-sm text-toss-sub mt-1">${esc(p.affiliation)}</p>`:''}
 <a href="tel:${p.phone}" class="text-toss-blue font-medium text-sm mt-1 inline-block">${esc(p.phone)}</a></div>
 <div class="grid grid-cols-4 gap-2 mb-5">
-${detailStatCard(!isUsage,`setDetailTab('${p.id}','payment')`,'누적 결제',shortMoney(p.total_paid),'text-xs')}
+${detailStatCard(!isUsage,`setDetailTab('${p.id}','payment')`,'누적 결제',shortMoney(p.total_paid))}
 ${detailStatCard(!isUsage,`setDetailTab('${p.id}','payment')`,'충전',p.total_sessions+'회')}
 ${detailStatCard(isUsage,`setDetailTab('${p.id}','usage')`,'사용',p.used_sessions+'회')}
 <div class="bg-[#E8F3FF] rounded-2xl p-3 text-center"><p class="text-[10px] text-toss-blue mb-1">잔여</p><p class="text-sm font-bold text-toss-blue">${p.remaining_sessions}회</p></div></div>
