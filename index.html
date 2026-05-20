@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<title>원유현 감독 전용 레슨 매니저</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{toss:{bg:'#F2F4F6',text:'#191F28',sub:'#4E5968',muted:'#8B95A1',blue:'#3182F6',green:'#0D7A5F',pink:'#F04452',emerald:'#00D084'}},fontFamily:{sans:['Paperlogy','system-ui','sans-serif']},boxShadow:{toss:'0 2px 16px rgba(0,0,0,.06)','toss-lg':'0 8px 24px rgba(0,0,0,.08)'}}}}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css"/>
+<style>
+html,body,button,input,select,textarea{font-family:'Paperlogy',system-ui,sans-serif}
+body{background:#F2F4F6;color:#191F28;-webkit-tap-highlight-color:transparent}
+.toss-card{background:#fff;border-radius:20px;box-shadow:0 2px 16px rgba(0,0,0,.06)}
+.toss-input{background:#F2F4F6;border:none;border-radius:14px;min-height:52px;font-size:16px;width:100%;padding:0 16px}
+.toss-input:focus{outline:2px solid #3182F6;background:#fff}
+.toss-textarea{min-height:120px;padding:14px 16px;resize:vertical}
+.btn-toss{background:#3182F6;color:#fff;border-radius:16px;min-height:52px;font-weight:600;font-size:16px;width:100%}
+.btn-toss-secondary{background:#E8F3FF;color:#3182F6;border-radius:16px;min-height:52px;font-weight:600;width:100%}
+.btn-toss-ghost{background:#F2F4F6;color:#4E5968;border-radius:16px;font-weight:600;min-height:48px;width:100%}
+.segment-wrap{display:flex;gap:8px;background:#F2F4F6;padding:4px;border-radius:14px}
+.segment-btn{flex:1;padding:12px 8px;border-radius:11px;font-size:15px;font-weight:600;color:#4E5968;background:transparent;border:none;cursor:pointer;font-family:inherit;transition:all .2s}
+.segment-btn.active{background:#fff;color:#3182F6;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.chart-bar,.chart-col{transition:width .65s cubic-bezier(.32,.72,0,1),height .65s cubic-bezier(.32,.72,0,1)}
+.bottom-nav{padding-bottom:env(safe-area-inset-bottom,0)}
+.bottom-nav-inner{display:flex;align-items:stretch;min-height:60px}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px 4px 8px;color:#8B95A1;background:transparent;border:0;cursor:pointer;font-family:inherit}
+.nav-btn .nav-icon-wrap{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-btn .nav-icon{width:24px;height:24px;display:block}
+.nav-btn .nav-label{font-size:11px;line-height:1;font-weight:500;letter-spacing:-.02em}
+.nav-btn.nav-active{color:#3182F6}
+.nav-btn.nav-active .nav-label{font-weight:700}
+.cal-day{min-height:84px;min-width:0;border-radius:12px}
+.cal-day.selected{background:#E8F3FF}
+.cal-num{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;font-size:14px;font-weight:600}
+.cal-num.today{background:#3182F6;color:#fff;border-radius:9999px}
+.timeline-line::before{content:'';position:absolute;left:7px;top:22px;bottom:0;width:2px;background:#E5E8EB}
+#sheetBackdrop{opacity:0;transition:opacity .25s ease}
+#sheetBackdrop.is-open{display:block!important;opacity:1}
+#sheet{transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);box-sizing:border-box}
+#sheet.is-open{display:block!important;transform:translateY(0)}
+#sheet.hidden{display:none!important;transform:translateY(100%)}
+@media (min-width:768px){
+#sheet{left:50%;right:auto;max-width:32rem;transform:translate(-50%,100%)}
+#sheet.is-open{transform:translate(-50%,0)}
+#sheet.hidden{transform:translate(-50%,100%)}
+}
+body.sheet-open{overflow:hidden}
+.dash-brand{font-size:1.35rem;font-weight:800;color:#3182F6;letter-spacing:-.02em;line-height:1.2}
+.dash-subtitle{font-size:15px;font-weight:400;color:#191F28;line-height:1.4}
+.dash-greeting{font-size:14px;font-weight:400;color:#191F28;white-space:nowrap}
+.dash-hero{border-radius:22px;overflow:hidden;background:#fff;box-shadow:0 2px 20px rgba(0,0,0,.07)}
+.dash-hero-clock{background:#EEF2F7;min-height:72px;padding:16px 20px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 14px}
+.dash-clock-date{font-size:clamp(1.625rem,6vw,1.875rem);font-weight:700;color:#191F28;letter-spacing:-.03em;line-height:1.25}
+.dash-clock-time{font-size:clamp(1.375rem,5vw,1.625rem);font-weight:400;color:#191F28;letter-spacing:-.02em;line-height:1.25}
+.dash-hero-body{padding:6px 16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:0}
+.dash-stat{display:flex;align-items:center;gap:11px;padding:14px 6px;border-bottom:1px solid #F2F4F6}
+.dash-stat:nth-child(odd){padding-right:10px}
+.dash-stat:nth-child(even){padding-left:10px;border-left:1px solid #F2F4F6}
+.dash-stat:nth-last-child(-n+2){border-bottom:none}
+.dash-stat-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#F2F4F6;color:#4E5968}
+.dash-stat-icon svg{width:18px;height:18px}
+.dash-stat-icon--lesson{background:#E8F3FF;color:#3182F6}
+.dash-stat-icon--lessons{background:#E6FAF3;color:#0D7A5F}
+.dash-stat-icon--deposit{background:#FFF4E6;color:#E65100}
+.dash-stat-label{font-size:11px;font-weight:500;color:#8B95A1;line-height:1.3}
+.dash-stat-value{font-size:1.35rem;font-weight:700;color:#191F28;line-height:1.2;letter-spacing:-.03em}
+.dash-stat-unit{font-size:12px;font-weight:600;color:#8B95A1;margin-left:2px}
+</style>
+</head>
+<body class="min-h-screen font-sans antialiased pb-24">
+<div id="app" class="max-w-lg mx-auto md:max-w-2xl lg:max-w-4xl">
+<header id="appHeader" class="sticky top-0 z-30 bg-[#F2F4F6]/95 backdrop-blur-sm px-5 pt-5 pb-3 hidden">
+<h1 class="text-[17px] font-bold leading-snug tracking-tight">원유현 감독 전용 레슨 매니저</h1>
+</header>
+<main class="px-5 pb-4">
+<section id="statsSection" class="mb-5 pt-5"></section>
+<section id="alertSection" class="hidden mb-5"></section>
+<div id="view-home" class="view-panel space-y-5"></div>
+<div id="view-players" class="view-panel hidden space-y-4"></div>
+<div id="view-calendar" class="view-panel hidden space-y-4"></div>
+</main>
+</div>
+<nav class="bottom-nav fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-100">
+<div class="bottom-nav-inner max-w-lg mx-auto md:max-w-2xl lg:max-w-4xl">
+<button type="button" data-view="home" class="nav-btn nav-active" aria-current="page">
+<span class="nav-icon-wrap"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z"/></svg></span>
+<span class="nav-label">홈</span>
+</button>
+<button type="button" data-view="players" class="nav-btn">
+<span class="nav-icon-wrap"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="9" cy="7" r="3.5"/><path d="M3 20v-1.5a5.5 5.5 0 0 1 5.5-5.5H10"/><circle cx="17" cy="8" r="2.5"/><path d="M15 20v-1.2a4 4 0 0 1 4-4h.5"/></svg></span>
+<span class="nav-label">회원</span>
+</button>
+<button type="button" data-view="calendar" class="nav-btn">
+<span class="nav-icon-wrap"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 11h16"/></svg></span>
+<span class="nav-label">스케줄</span>
+</button>
+</div>
+</nav>
+<button id="fab" type="button" class="fixed bottom-20 right-5 w-14 h-14 rounded-full bg-toss-blue text-white text-2xl shadow-toss-lg z-50 hidden items-center justify-center" aria-label="추가">+</button>
+<div id="sheetBackdrop" class="fixed inset-0 bg-black/40 z-[60] hidden" aria-hidden="true"></div>
+<div id="sheet" class="fixed inset-x-0 bottom-0 z-[70] w-full max-h-[min(92vh,900px)] overflow-y-auto overflow-x-hidden bg-white rounded-t-[24px] px-6 pt-5 pb-8 shadow-toss-lg hidden md:rounded-3xl" role="dialog" aria-modal="true"></div>
+<script>
+const STORAGE_KEY='soccer-lesson-app-v4';
+const DATA_VERSION=4;
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const WEEKDAYS=['일','월','화','수','목','금','토'];
+let state={players:[],schedules:[]};
+let currentView='home',calendarMode='month',calendarDate=new Date(),selectedDate=null,detailTab='payment';
+
+function fmtISO(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${day}`;}
+function todayISO(){return fmtISO(new Date());}
+function addDaysISO(iso,n){const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return fmtISO(d);}
+function parseISO(iso){return new Date(iso+'T12:00:00');}
+function monthYM(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+
+function buildDemoSchedules(){
+const done=[];
+const plan=[{off:-3,n:5},{off:-2,n:8},{off:-1,n:6},{off:0,n:4}];
+const pids=['p1','p2','p3','p4'];
+let i=0;
+plan.forEach(({off,n})=>{
+const base=new Date();base.setDate(1);base.setMonth(base.getMonth()+off);
+for(let j=0;j<n;j++){
+const day=Math.min(4+j*3,26);
+done.push({id:'hc'+(++i),date:fmtISO(new Date(base.getFullYear(),base.getMonth(),day)),time:(9+j%6)+':00',player_id:pids[j%4],status:'completed'});
+}
+});
+return[...done,
+{id:'s1',date:todayISO(),time:'15:00',player_id:'p1',status:'scheduled'},
+{id:'s2',date:todayISO(),time:'17:00',player_id:'p3',status:'scheduled'},
+{id:'s3',date:addDaysISO(todayISO(),1),time:'10:00',player_id:'p2',status:'scheduled'},
+{id:'s4',date:addDaysISO(todayISO(),3),time:'14:00',player_id:'p4',status:'scheduled'}];
+}
+
+const defaultData=()=>({
+_version:DATA_VERSION,
+players:[
+{id:'p1',name:'홍길동',birth_date:'2012-03-01',gender:'남성',phone:'010-1234-5678',affiliation:'○○중 FC',memo:'골키퍼 집중.\n발 구석 잡기 연습 중. 무릎 주의.',payment_history:[{date:'2026-03-01',amount:500000,sessions:10},{date:'2026-05-01',amount:250000,sessions:5}],used_sessions:8},
+{id:'p2',name:'김철수',birth_date:'2009-04-10',gender:'남성',phone:'010-9876-5432',affiliation:'△△고등학교',memo:'필드 플레이어. 스피드·패스 위주.',payment_history:[{date:'2026-04-10',amount:600000,sessions:12}],used_sessions:11},
+{id:'p3',name:'이영희',birth_date:'2014-05-10',gender:'여성',phone:'010-5555-1234',affiliation:'□□초등부',memo:'주 1회 그룹 레슨 참여.',payment_history:[{date:'2026-05-10',amount:400000,sessions:8}],used_sessions:2},
+{id:'p4',name:'박민수',birth_date:'2002-02-15',gender:'남성',phone:'010-2222-8888',affiliation:'개인 레슨',memo:'성인 취미반. 체력·기술 병행.',payment_history:[{date:'2026-02-15',amount:450000,sessions:10}],used_sessions:4}
+],
+schedules:buildDemoSchedules()
+});
+
+function calcAge(birthDate,ref=new Date()){
+if(!birthDate)return null;
+const b=parseISO(birthDate);
+const r=ref instanceof Date?ref:parseISO(ref);
+let age=r.getFullYear()-b.getFullYear();
+const md=(r.getMonth()-b.getMonth())*32+(r.getDate()-b.getDate());
+if(md<0)age--;
+return age;
+}
+function ageToBirthDate(age){
+const n=new Date();
+const y=n.getFullYear()-Number(age);
+return fmtISO(new Date(y,n.getMonth(),n.getDate()));
+}
+function getAge(p){return calcAge(p?.birth_date)??(p?.age!=null&&p.age!==''?Number(p.age):null);}
+function migrateState(){
+state.players.forEach(p=>{
+if(!p.gender)p.gender='남성';
+if(!p.birth_date&&(p.age!=null&&p.age!==''))p.birth_date=ageToBirthDate(p.age);
+if(!p.birth_date)p.birth_date=ageToBirthDate(14);
+delete p.age;
+});
+}
+
+function ensureChartSampleData(){
+const completed=state.schedules.filter(s=>s.status==='completed').length;
+if(completed>=3)return;
+buildDemoSchedules().filter(s=>s.status==='completed').forEach(s=>{
+if(!state.schedules.some(x=>x.id===s.id))state.schedules.push({...s});
+});
+}
+
+function upgradeState(raw){
+const demo=defaultData();
+if(!raw||!raw.players||!raw.players.length)return{...demo};
+const players=raw.players.map(p=>({
+...p,
+gender:p.gender||'남성',
+birth_date:p.birth_date||(p.age!=null?ageToBirthDate(p.age):ageToBirthDate(14)),
+payment_history:p.payment_history||[],
+}));
+let schedules=Array.isArray(raw.schedules)?[...raw.schedules]:[];
+const completedCount=schedules.filter(s=>s.status==='completed').length;
+if(completedCount<3){
+const keep=schedules.filter(s=>s.status!=='completed');
+const demoDone=demo.schedules.filter(s=>s.status==='completed');
+schedules=[...keep,...demoDone];
+}
+if(!schedules.length)schedules=demo.schedules;
+return{_version:DATA_VERSION,players,schedules};
+}
+
+function loadState(){
+try{
+let raw=localStorage.getItem(STORAGE_KEY);
+if(!raw)raw=localStorage.getItem('soccer-lesson-app-v3')||localStorage.getItem('soccer-lesson-app-v2');
+if(raw){
+const parsed=JSON.parse(raw);
+if(parsed._version===DATA_VERSION&&parsed.players&&parsed.players.length){
+state=parsed;
+migrateState();
+ensureChartSampleData();
+}else{
+state=upgradeState(parsed);
+}
+}else{
+state=defaultData();
+}
+}catch{
+state=defaultData();
+}
+syncAll();
+saveState();
+}
+function saveState(){
+state._version=DATA_VERSION;
+syncAll();
+localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+}
+function syncAll(){state.players.forEach(syncPlayer);}
+function syncPlayer(p){const h=p.payment_history||[];p.total_paid=h.reduce((s,x)=>s+(x.amount||0),0);p.total_sessions=h.reduce((s,x)=>s+(x.sessions||0),0);p.used_sessions=Math.min(p.used_sessions||0,p.total_sessions);p.remaining_sessions=Math.max(0,p.total_sessions-p.used_sessions);}
+function getPlayer(id){return state.players.find(p=>p.id===id);}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function money(n){return new Intl.NumberFormat('ko-KR').format(n)+'원';}
+function shortMoney(n){if(n>=10000)return Math.round(n/10000)+'만';if(n>=1000)return Math.round(n/1000)+'천';return String(n);}
+function phone(v){const d=String(v).replace(/\D/g,'');if(d.length<=3)return d;if(d.length<=7)return d.slice(0,3)+'-'+d.slice(3);return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11);}
+function fmtShort(iso){const[,m,d]=iso.split('-');return Number(m)+'월 '+Number(d)+'일';}
+function fmtFull(iso){const[y,m,d]=iso.split('-');return y+'.'+m+'.'+d;}
+function isThisMonth(iso){const d=parseISO(iso),n=new Date();return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();}
+function isLow(p){return p.total_sessions>0&&p.remaining_sessions<=2;}
+function formatDisplayDate(d=new Date()){return`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;}
+function formatClockTime(d=new Date()){
+const h=d.getHours(),m=d.getMinutes(),ap=h<12?'오전':'오후',h12=h%12||12;
+return`${ap} ${h12}:${String(m).padStart(2,'0')}`;
+}
+function updateDashClock(){
+const el=document.getElementById('dashClock');
+if(!el)return;
+const now=new Date();
+const dateEl=el.querySelector('.dash-clock-date');
+const timeEl=el.querySelector('.dash-clock-time');
+if(dateEl)dateEl.textContent=formatDisplayDate(now);
+if(timeEl)timeEl.textContent=formatClockTime(now);
+}
+let dashClockTimer=null;
+function startDashClock(){
+if(dashClockTimer)clearInterval(dashClockTimer);
+updateDashClock();
+dashClockTimer=setInterval(updateDashClock,1000);
+}
+function getDashboardStats(){
+const registered=state.players.length;
+const lessonMembers=state.players.filter(p=>p.remaining_sessions>0).length;
+const totalLessons=state.schedules.filter(s=>s.status==='completed').length;
+const totalDeposits=state.players.reduce((s,p)=>s+(p.payment_history||[]).reduce((a,h)=>a+(h.amount||0),0),0);
+return{registered,lessonMembers,totalLessons,totalDeposits};
+}
+function getMonthStats(){const deposits=state.players.reduce((s,p)=>s+(p.payment_history||[]).filter(h=>isThisMonth(h.date)).reduce((a,h)=>a+h.amount,0),0);const deductions=state.schedules.filter(s=>s.status==='completed'&&isThisMonth(s.date)).length;return{deposits,deductions};}
+function onDate(iso){return state.schedules.filter(s=>s.date===iso).sort((a,b)=>a.time.localeCompare(b.time));}
+function badge(p){return isLow(p)?'<span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#FFF0E0] text-[#E65100]">재결제 필요</span>':'';}
+function profileBadge(p){const g=p.gender==='여성'?'여':'남';const age=getAge(p);return`<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-toss-bg text-toss-sub shrink-0">${age!=null?age+'세':'?'} · ${g}</span>`;}
+
+function endOfMonthISO(ym){
+const[y,m]=ym.split('-').map(Number);
+return fmtISO(new Date(y,m,0));
+}
+function snapshotDateForMonth(ym){
+return ym===monthYM(new Date())?todayISO():endOfMonthISO(ym);
+}
+function remainingAtDate(p,endIso){
+const charged=(p.payment_history||[]).filter(h=>h.date<=endIso).reduce((s,x)=>s+(x.sessions||0),0);
+if(!charged)return 0;
+const used=state.schedules.filter(s=>s.player_id===p.id&&s.status==='completed'&&s.date<=endIso).length;
+return Math.max(0,charged-used);
+}
+function isMaintainedInMonth(p,ym){
+const end=snapshotDateForMonth(ym);
+const first=(p.payment_history||[]).map(h=>h.date).filter(Boolean).sort()[0];
+if(!first||first>end)return false;
+return remainingAtDate(p,end)>0;
+}
+function getMonthlyActiveMembers(){
+return getLastMonths(6).map(m=>({...m,count:state.players.filter(p=>isMaintainedInMonth(p,m.ym)).length}));
+}
+function getLastMonths(n){
+const arr=[];
+const now=new Date();
+for(let i=n-1;i>=0;i--){
+const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+arr.push({ym:monthYM(d),label:(d.getMonth()+1)+'월',shortLabel:String(d.getMonth()+1)});
+}
+return arr;
+}
+function getMonthlyLessons(){
+return getLastMonths(4).map(m=>({
+...m,
+count:state.schedules.filter(s=>s.status==='completed'&&s.date.slice(0,7)===m.ym).length
+}));
+}
+
+function renderActiveLineChart(active){
+const W=300,H=130,padL=16,padR=16,padT=20,padB=8;
+const plotW=W-padL-padR,plotH=H-padT-padB;
+const max=Math.max(...active.map(m=>m.count),1);
+const pts=active.map((m,i)=>{
+const x=padL+(active.length>1?i/(active.length-1):0.5)*plotW;
+const y=padT+plotH-(m.count/max)*plotH;
+return{x,y,count:m.count};
+});
+const line=pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+const base=padT+plotH;
+const area=pts.length?`M ${pts[0].x} ${pts[0].y} ${pts.slice(1).map(p=>`L ${p.x} ${p.y}`).join(' ')} L ${pts[pts.length-1].x} ${base} L ${pts[0].x} ${base} Z`:'';
+return`<svg viewBox="0 0 ${W} ${H}" class="w-full chart-line" aria-hidden="true">
+${area?`<path d="${area}" fill="#3182F6" fill-opacity="0.1"/>`:''}
+<polyline points="${line}" fill="none" stroke="#3182F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#fff" stroke="#3182F6" stroke-width="2.5"/>`).join('')}
+${pts.map(p=>`<text x="${p.x}" y="${Math.max(p.y-10,12)}" text-anchor="middle" fill="#191F28" font-size="11" font-weight="700">${p.count}</text>`).join('')}
+</svg>
+<div class="flex justify-between mt-2 px-1">${active.map(m=>`<span class="text-[11px] text-toss-muted flex-1 text-center">${m.label}</span>`).join('')}</div>`;
+}
+
+function renderCharts(){
+const active=getMonthlyActiveMembers();
+const monthly=getMonthlyLessons();
+const maxMonth=Math.max(...monthly.map(m=>m.count),1);
+const currentActive=active.length?active[active.length-1].count:0;
+
+if(!state.players.length)return`<div class="toss-card p-8 text-center text-toss-muted text-sm">회원을 등록하면 통계가 표시됩니다</div>`;
+
+return`
+<section class="space-y-4">
+<h2 class="text-lg font-bold">통계 분석</h2>
+
+<div class="toss-card p-5">
+<p class="text-sm font-semibold text-toss-text mb-1">월별 유지 회원 수</p>
+<p class="text-xs text-toss-muted mb-1">잔여 회차가 1회 이상인 회원 · 최근 6개월</p>
+<p class="text-2xl font-bold text-toss-blue mb-3">이번 달 <span class="text-toss-text">${currentActive}</span><span class="text-base font-medium text-toss-muted ml-1">명</span></p>
+${renderActiveLineChart(active)}
+</div>
+
+<div class="toss-card p-5">
+<p class="text-sm font-semibold text-toss-text mb-1">월별 레슨 차감 현황</p>
+<p class="text-xs text-toss-muted mb-5">최근 4개월 완료 레슨</p>
+<div class="flex items-end justify-between gap-2 h-36 px-1">
+${monthly.map(m=>{
+const h=maxMonth?Math.round(m.count/maxMonth*100):0;
+return`<div class="flex-1 flex flex-col items-center gap-2 min-w-0">
+<div class="w-full flex items-end justify-center h-28"><div class="chart-col w-[70%] max-w-[40px] rounded-t-xl bg-[#3182F6]" style="height:${Math.max(h,4)}%"></div></div>
+<p class="text-xs font-bold text-toss-text">${m.count}</p>
+<p class="text-[11px] text-toss-muted">${m.label}</p>
+</div>`;
+}).join('')}
+</div>
+</div>
+</section>`;
+}
+
+document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+
+function setView(v){
+currentView=v;
+document.querySelectorAll('.nav-btn').forEach(b=>{const on=b.dataset.view===v;b.classList.toggle('nav-active',on);b.setAttribute('aria-current',on?'page':'false');});
+document.querySelectorAll('.view-panel').forEach(el=>el.classList.add('hidden'));
+document.getElementById('view-'+v).classList.remove('hidden');
+document.getElementById('statsSection').classList.toggle('hidden',v!=='home');
+document.getElementById('appHeader').classList.toggle('hidden',v==='home');
+if(v==='home')startDashClock();
+const fab=document.getElementById('fab');
+fab.style.display=v==='home'?'none':'flex';
+fab.onclick=()=>{if(v==='players')openSheet('player');else openSheet('schedule',{date:selectedDate||todayISO()});};
+render();
+}
+
+function render(){renderStats();renderAlerts();renderHome();renderPlayers();renderCalendar();}
+
+const DASH_SVG={
+users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="9" cy="7" r="3.5"/><path d="M3 20v-1.5A5.5 5.5 0 0 1 8.5 13H10"/><circle cx="17" cy="8" r="2.5"/><path d="M15 20v-1.2a4 4 0 0 1 4-4h.5"/></svg>',
+lesson:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>',
+won:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 3v18M8 7h8a3 3 0 1 1 0 6H8a3 3 0 0 0 0 6h8"/></svg>'
+};
+function formatDeposit(n){
+if(n>=100000000)return(n/100000000).toFixed(1).replace(/\.0$/,'')+'억';
+if(n>=10000)return Math.round(n/10000).toLocaleString('ko-KR')+'만';
+return n.toLocaleString('ko-KR');
+}
+function dashStat(type,label,value,unit){
+const icons={registered:'users',lesson:'lesson',lessons:'check',deposit:'won'};
+const iconCls=type==='registered'?'dash-stat-icon':`dash-stat-icon dash-stat-icon--${type}`;
+return`<div class="dash-stat"><span class="${iconCls}">${DASH_SVG[icons[type]]}</span><div class="min-w-0 flex-1"><p class="dash-stat-label">${label}</p><p class="dash-stat-value">${value}<span class="dash-stat-unit">${unit}</span></p></div></div>`;
+}
+function renderStats(){
+const now=new Date();
+const{registered,lessonMembers,totalLessons,totalDeposits}=getDashboardStats();
+document.getElementById('statsSection').innerHTML=`
+<div class="mb-4">
+<p class="dash-brand">LESSON MANAGER</p>
+<div class="flex items-end justify-between gap-3 mt-1">
+<p class="dash-subtitle">원유현 감독 전용 레슨 매니저</p>
+<p class="dash-greeting">사랑해 여보❤️</p>
+</div>
+</div>
+<article class="dash-hero">
+<div id="dashClock" class="dash-hero-clock">
+<span class="dash-clock-date">${formatDisplayDate(now)}</span>
+<span class="dash-clock-time">${formatClockTime(now)}</span>
+</div>
+<div class="dash-hero-body">
+${dashStat('registered','등록 회원',registered,'명')}
+${dashStat('lesson','레슨 회원',lessonMembers,'명')}
+${dashStat('lessons','총 레슨',totalLessons,'회')}
+${dashStat('deposit','총 입금액',formatDeposit(totalDeposits),'원')}
+</div>
+</article>`;
+if(currentView==='home')startDashClock();
+}
+
+
+function renderAlerts(){
+const low=state.players.filter(isLow),el=document.getElementById('alertSection');
+if(!low.length){el.classList.add('hidden');return;}
+el.classList.remove('hidden');
+el.innerHTML=`<div class="toss-card p-4 flex gap-3 bg-[#FFF8EB]"><span class="text-xl">⚠️</span><div><p class="font-semibold text-[#E65100] text-sm">재결제가 필요한 회원 ${low.length}명</p><p class="text-xs text-toss-sub mt-1">${low.map(p=>esc(p.name)).join(', ')}</p></div></div>`;
+}
+
+function renderHome(){
+const upcoming=[...state.schedules].filter(s=>s.status==='scheduled'&&s.date>=todayISO()).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,5);
+document.getElementById('view-home').innerHTML=`
+${renderCharts()}
+<section class="mt-2"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-bold">회원 현황</h2><button type="button" onclick="setView('players')" class="text-sm text-toss-blue font-semibold">전체 보기</button></div>
+<div class="space-y-3">${state.players.length?state.players.map(summaryCard).join(''):'<div class="toss-card p-10 text-center text-toss-sub">등록된 회원이 없어요</div>'}</div></section>
+<section class="mt-6"><h2 class="text-lg font-bold mb-3">다가오는 레슨</h2>
+<div class="space-y-2">${upcoming.length?upcoming.map(schedRow).join(''):'<p class="text-center py-8 text-toss-muted text-sm">예정된 레슨이 없습니다</p>'}</div></section>`;
+}
+
+function summaryCard(p){return`<button type="button" onclick="openSheet('detail','${p.id}')" class="toss-card w-full p-5 text-left">
+<div class="flex justify-between mb-2"><div class="flex flex-wrap gap-2 items-center min-w-0"><span class="font-bold text-lg truncate">${esc(p.name)}</span>${profileBadge(p)}${badge(p)}</div><span class="text-toss-blue text-sm font-semibold shrink-0">상세 →</span></div>
+<div class="grid grid-cols-2 gap-2"><div class="bg-toss-bg rounded-xl p-3"><p class="text-xs text-toss-muted mb-0.5">누적 결제</p><p class="font-bold">${money(p.total_paid||0)}</p></div>
+<div class="bg-toss-bg rounded-xl p-3"><p class="text-xs text-toss-muted mb-0.5">충전 / 사용 / 잔여</p>
+<p class="font-bold"><span class="text-toss-sub">${p.total_sessions}</span> / <span class="text-toss-sub">${p.used_sessions}</span> / <span class="text-toss-blue text-lg">${p.remaining_sessions}</span><span class="text-xs text-toss-muted">회</span></p></div></div></button>`;}
+
+function renderPlayers(){
+document.getElementById('view-players').innerHTML=`<div class="flex justify-between mb-1"><h2 class="text-lg font-bold">회원 관리</h2><button type="button" onclick="openSheet('player')" class="text-sm text-toss-blue font-semibold px-3 py-2">+ 추가</button></div>
+<p class="text-sm text-toss-sub mb-4">카드를 눌러 입금 내역과 메모를 확인하세요</p>
+<div class="space-y-3">${state.players.map(listCard).join('')}</div>`;
+}
+function listCard(p){return`<button type="button" onclick="openSheet('detail','${p.id}')" class="toss-card w-full p-5 text-left">
+<div class="flex flex-wrap items-center gap-2 mb-1"><h3 class="font-bold text-[17px]">${esc(p.name)}</h3>${profileBadge(p)}${badge(p)}</div>
+${p.affiliation?`<p class="text-sm text-toss-sub mb-3">${esc(p.affiliation)}</p>`:'<div class="mb-2"></div>'}
+<div class="grid grid-cols-4 gap-1 text-center">
+<div><p class="text-[10px] text-toss-muted mb-1">누적 결제</p><p class="text-xs font-bold">${shortMoney(p.total_paid)}</p></div>
+<div><p class="text-[10px] text-toss-muted mb-1">충전</p><p class="text-sm font-bold">${p.total_sessions}회</p></div>
+<div><p class="text-[10px] text-toss-muted mb-1">사용</p><p class="text-sm font-bold">${p.used_sessions}회</p></div>
+<div><p class="text-[10px] text-toss-muted mb-1">잔여</p><p class="text-sm font-bold text-toss-blue">${p.remaining_sessions}회</p></div></div></button>`;}
+
+function schedRow(s){const p=getPlayer(s.player_id),n=p?p.name:'?';return`<div class="toss-card p-4 flex justify-between items-center gap-3">
+<div><p class="font-semibold">${esc(n)}</p><p class="text-sm text-toss-sub">${fmtShort(s.date)} ${s.time}</p></div>
+${s.status==='scheduled'?`<button type="button" onclick="completeLesson('${s.id}')" class="btn-toss !w-auto px-4 !min-h-[44px] text-sm shrink-0">완료</button>`:'<span class="text-xs text-toss-muted font-medium">차감 완료</span>'}</div>`;}
+
+function startOfWeek(d){const s=new Date(d);s.setDate(s.getDate()-s.getDay());return s;}
+function weekLabel(d){const s=startOfWeek(d),e=new Date(s);e.setDate(e.getDate()+6);return(s.getMonth()+1)+'/'+s.getDate()+' – '+(e.getMonth()+1)+'/'+e.getDate();}
+
+function renderCalendar(){
+const y=calendarDate.getFullYear(),m=calendarDate.getMonth();
+const title=calendarMode==='month'?y+'년 '+(m+1)+'월':weekLabel(calendarDate);
+document.getElementById('view-calendar').innerHTML=`
+<div class="toss-card p-4"><div class="flex items-center justify-between mb-4">
+<button type="button" onclick="calNav(-1)" class="w-10 h-10 rounded-full bg-toss-bg font-bold text-toss-sub">‹</button>
+<div class="text-center"><p class="font-bold text-lg">${title}</p>
+<div class="flex gap-1 mt-2 justify-center">
+<button type="button" onclick="setCalMode('month')" class="px-3 py-1 rounded-full text-xs font-semibold ${calendarMode==='month'?'bg-toss-blue text-white':'bg-toss-bg text-toss-sub'}">월</button>
+<button type="button" onclick="setCalMode('week')" class="px-3 py-1 rounded-full text-xs font-semibold ${calendarMode==='week'?'bg-toss-blue text-white':'bg-toss-bg text-toss-sub'}">주</button></div></div>
+<button type="button" onclick="calNav(1)" class="w-10 h-10 rounded-full bg-toss-bg font-bold text-toss-sub">›</button></div>
+<div class="grid grid-cols-7 gap-1 mb-1">${WEEKDAYS.map((d,i)=>`<div class="text-center text-xs font-medium py-1 ${i===0?'text-red-500':i===6?'text-toss-blue':'text-toss-muted'}">${d}</div>`).join('')}</div>
+<div id="calGrid" class="grid grid-cols-7 gap-1"></div></div>
+<div id="dayPanel" class="mt-4"></div>`;
+renderCalGrid();renderDayPanel(selectedDate||todayISO());
+}
+
+function setCalMode(mode){calendarMode=mode;renderCalendar();}
+function calNav(dir){if(calendarMode==='month')calendarDate.setMonth(calendarDate.getMonth()+dir);else calendarDate.setDate(calendarDate.getDate()+dir*7);renderCalendar();}
+
+function calDays(){
+if(calendarMode==='week'){const s=startOfWeek(calendarDate);return Array.from({length:7},(_,i)=>{const d=new Date(s);d.setDate(d.getDate()+i);return{date:d,outside:d.getMonth()!==calendarDate.getMonth()};});}
+const y=calendarDate.getFullYear(),m=calendarDate.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),days=[];
+for(let i=0;i<first.getDay();i++){const d=new Date(y,m,1-(first.getDay()-i));days.push({date:d,outside:true});}
+for(let d=1;d<=last.getDate();d++)days.push({date:new Date(y,m,d),outside:false});
+while(days.length<42){const d=new Date(y,m+1,days.length-first.getDay()-last.getDate()+1);days.push({date:d,outside:true});}
+return days;
+}
+
+function renderCalGrid(){
+const today=todayISO();
+document.getElementById('calGrid').innerHTML=calDays().map(({date,outside})=>{
+const iso=fmtISO(date),scheds=onDate(iso).filter(s=>s.status!=='canceled'),sel=selectedDate===iso,isT=today===iso;
+const tags=scheds.slice(0,2).map(s=>{const p=getPlayer(s.player_id),done=s.status==='completed';
+return`<span class="block truncate text-[9px] px-1 py-0.5 rounded font-medium ${done?'bg-gray-200 text-toss-muted':'bg-[#E8F3FF] text-toss-blue'}">${esc((p?.name||'?').slice(0,4))}</span>`;}).join('');
+const more=scheds.length>2?`<span class="text-[9px] text-toss-muted">+${scheds.length-2}</span>`:'';
+return`<button type="button" onclick="selectCalDay('${iso}')" class="cal-day p-1 text-left w-full ${sel?'selected ring-2 ring-toss-blue':''} ${outside?'opacity-40':''} hover:bg-toss-bg">
+<span class="cal-num ${isT?'today':''}">${date.getDate()}</span><div class="space-y-0.5 mt-0.5">${tags}${more}</div></button>`;}).join('');
+}
+
+function selectCalDay(iso){selectedDate=iso;renderCalGrid();renderDayPanel(iso);}
+
+function renderDayPanel(iso){
+const scheds=onDate(iso),el=document.getElementById('dayPanel');
+if(!el)return;
+el.innerHTML=`<div class="flex justify-between mb-3"><h3 class="font-bold text-lg">${fmtShort(iso)} 일정</h3>
+<button type="button" onclick="openSheet('schedule','${iso}')" class="text-sm text-toss-blue font-semibold">+ 추가</button></div>
+${scheds.length?scheds.map(dayCard).join(''):'<div class="toss-card p-8 text-center text-toss-muted text-sm">예약된 레슨이 없습니다</div>'}`;
+}
+
+function dayCard(s){
+const p=getPlayer(s.player_id),n=p?p.name:'알 수 없음',done=s.status==='completed',no=!done&&p&&p.remaining_sessions<=0;
+return`<div class="toss-card p-5 mb-3"><div class="flex justify-between items-start gap-3 mb-3"><div class="min-w-0 flex-1"><p class="font-bold text-[17px]">${esc(n)}</p><p class="text-sm text-toss-sub">${s.time}${p?` · 잔여 ${p.remaining_sessions}회`:''}</p></div>
+<span class="inline-flex items-center justify-center shrink-0 h-7 px-3 text-xs font-semibold leading-none rounded-full ${done?'bg-toss-bg text-toss-muted':'bg-[#E8F3FF] text-toss-blue'}">${done?'차감 완료':'예정'}</span></div>
+${!done&&!no?`<button type="button" onclick="completeLesson('${s.id}')" class="btn-toss">레슨 완료 (1회 차감)</button>`:''}
+${no?`<button type="button" onclick="openSheet('payment','${p.id}')" class="w-full py-3 rounded-2xl bg-[#FFF0E0] text-[#E65100] font-semibold mt-2">회차 충전이 필요해요</button>`:''}
+${!done?`<button type="button" onclick="cancelSchedule('${s.id}')" class="w-full mt-2 py-2 text-sm text-toss-muted">일정 취소</button>`:''}</div>`;
+}
+
+function openSheet(type,arg){
+if(type==='player')renderPlayerForm(arg);
+else if(type==='payment')renderPaymentForm(arg);
+else if(type==='schedule')renderScheduleForm(typeof arg==='string'?arg:arg?.date);
+else if(type==='detail'){detailTab='payment';renderDetail(arg);}
+const sheet=document.getElementById('sheet'),bd=document.getElementById('sheetBackdrop');
+bd.classList.remove('hidden');sheet.classList.remove('hidden');
+document.body.classList.add('sheet-open');
+requestAnimationFrame(()=>{bd.classList.add('is-open');sheet.classList.add('is-open');});
+}
+function closeSheet(){
+const sheet=document.getElementById('sheet'),bd=document.getElementById('sheetBackdrop');
+bd.classList.remove('is-open');sheet.classList.remove('is-open');
+document.body.classList.remove('sheet-open');
+setTimeout(()=>{bd.classList.add('hidden');sheet.classList.add('hidden');sheet.innerHTML='';},280);
+}
+document.getElementById('sheetBackdrop').addEventListener('click',closeSheet);
+
+function genderSegment(current){
+const m=(current||'남성')==='남성';
+return`<div class="segment-wrap" role="group" aria-label="성별">
+<input type="hidden" name="gender" id="genderInput" value="${m?'남성':'여성'}"/>
+<button type="button" class="segment-btn ${m?'active':''}" onclick="pickGender(this,'남성')">남성</button>
+<button type="button" class="segment-btn ${m?'':'active'}" onclick="pickGender(this,'여성')">여성</button>
+</div>`;
+}
+function pickGender(btn,val){
+const wrap=btn.closest('.segment-wrap');
+wrap.querySelector('#genderInput').value=val;
+wrap.querySelectorAll('.segment-btn').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+}
+window.pickGender=pickGender;
+
+function renderPlayerForm(id){
+const p=id?getPlayer(id):null;
+const g=p?.gender||'남성';
+document.getElementById('sheet').innerHTML=`<div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
+<h2 class="text-xl font-bold mb-5">${p?'회원 수정':'회원 등록'}</h2>
+<form id="playerForm" onsubmit="submitPlayer(event,'${p?.id||''}')" class="space-y-4">
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">이름 *</span><input name="name" required class="toss-input" value="${esc(p?.name||'')}" placeholder="홍길동"/></label>
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">연락처 *</span><input name="phone" required class="toss-input" value="${esc(p?.phone||'')}" placeholder="010-0000-0000"/></label>
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">성별 *</span>${genderSegment(g)}</label>
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">생년월일 *</span><input name="birth_date" type="date" required class="toss-input" value="${p?.birth_date||''}" max="${todayISO()}"/><p class="text-xs text-toss-muted mt-1.5">생일 기준 만 나이가 자동으로 계산됩니다</p></label>
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">소속팀</span><input name="affiliation" class="toss-input" value="${esc(p?.affiliation||'')}" placeholder="학교 / 클럽"/></label>
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">메모</span><textarea name="memo" class="toss-input toss-textarea" placeholder="포지션, 특이사항, 부상 이력 등">${esc(p?.memo||'')}</textarea></label>
+<div class="flex gap-2"><button type="submit" class="btn-toss flex-1">저장</button><button type="button" onclick="closeSheet()" class="btn-toss-ghost flex-1">닫기</button></div>
+${p?`<button type="button" onclick="deletePlayer('${p.id}')" class="w-full mt-3 py-3 text-red-500 text-sm">회원 삭제</button>`:''}</form>`;
+}
+
+function renderPaymentForm(id){
+const p=getPlayer(id);if(!p)return closeSheet();
+document.getElementById('sheet').innerHTML=`<div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
+<h2 class="text-xl font-bold mb-1">선불 충전</h2><p class="text-toss-sub text-sm mb-5">${esc(p.name)} ${profileBadge(p)} · 잔여 ${p.remaining_sessions}회</p>
+<form onsubmit="submitPayment(event,'${p.id}')" class="space-y-4">
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">입금일</span><input name="date" type="date" required class="toss-input" value="${todayISO()}"/></label>
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">입금 금액 (원)</span><input name="amount" type="number" required min="0" step="1000" class="toss-input" placeholder="500000"/></label>
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">충전 회차</span><input name="sessions" type="number" required min="1" class="toss-input" placeholder="10"/></label>
+<button type="submit" class="btn-toss">충전 완료</button></form>`;
+}
+
+function renderScheduleForm(date){
+const opts=state.players.map(p=>`<option value="${p.id}">${esc(p.name)} (${getAge(p)??'?'}세 · 잔여 ${p.remaining_sessions}회)</option>`).join('');
+document.getElementById('sheet').innerHTML=`<div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
+<h2 class="text-xl font-bold mb-5">레슨 예약</h2>
+<form onsubmit="submitSchedule(event)" class="space-y-4">
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">날짜</span><input name="date" type="date" required class="toss-input" value="${date||todayISO()}"/></label>
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">시간</span><input name="time" type="time" required class="toss-input" value="15:00"/></label>
+<label class="block"><span class="text-sm text-toss-sub mb-2 block">선수</span><select name="player_id" required class="toss-input"><option value="">선택</option>${opts}</select></label>
+<button type="submit" class="btn-toss">등록</button></form>`;
+}
+
+function getUsageHistory(pid){
+return state.schedules.filter(s=>s.player_id===pid&&s.status==='completed').sort((a,b)=>{
+const d=b.date.localeCompare(a.date);
+return d!==0?d:b.time.localeCompare(a.time);
+});
+}
+function renderPaymentTimeline(p){
+const hist=[...(p.payment_history||[])].sort((a,b)=>b.date.localeCompare(a.date));
+if(!hist.length)return'<p class="text-sm text-toss-muted">입금 내역이 없습니다</p>';
+return hist.map((h,i)=>`<div class="relative pb-6 ${i===hist.length-1?'pb-0':''}"><span class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-toss-blue border-4 border-white"></span><p class="font-semibold">${fmtFull(h.date)}</p><p class="text-toss-blue font-bold text-lg">${money(h.amount)}</p><p class="text-sm text-toss-sub">${h.sessions}회 충전</p></div>`).join('');
+}
+function renderUsageTimeline(pid){
+const list=getUsageHistory(pid);
+if(!list.length)return'<p class="text-sm text-toss-muted">사용 내역이 없습니다</p>';
+return list.map((s,i)=>`<div class="relative pb-6 ${i===list.length-1?'pb-0':''}"><span class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-[#00D084] border-4 border-white"></span><p class="font-semibold">${fmtFull(s.date)}</p><p class="text-[#00D084] font-bold text-lg">${s.time}</p><p class="text-sm text-toss-sub">1회 차감 · 레슨 완료</p></div>`).join('');
+}
+function detailStatCard(active,onclick,label,value,valueClass='text-sm'){
+return`<button type="button" onclick="${onclick}" class="rounded-2xl p-3 text-center w-full ${active?'bg-white ring-2 ring-toss-blue shadow-toss':'bg-toss-bg'}"><p class="text-[10px] text-toss-muted mb-1">${label}</p><p class="${valueClass} font-bold">${value}</p></button>`;
+}
+function setDetailTab(pid,tab){detailTab=tab;renderDetail(pid);}
+function renderDetail(id){
+const p=getPlayer(id);if(!p)return closeSheet();
+const isUsage=detailTab==='usage';
+const timeline=isUsage?renderUsageTimeline(p.id):renderPaymentTimeline(p);
+document.getElementById('sheet').innerHTML=`<div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
+<div class="mb-4"><div class="flex flex-wrap items-center gap-2"><h2 class="text-xl font-bold">${esc(p.name)}</h2>${profileBadge(p)}${badge(p)}</div>
+${p.affiliation?`<p class="text-sm text-toss-sub mt-1">${esc(p.affiliation)}</p>`:''}
+<a href="tel:${p.phone}" class="text-toss-blue font-medium text-sm mt-1 inline-block">${esc(p.phone)}</a></div>
+<div class="grid grid-cols-4 gap-2 mb-5">
+${detailStatCard(!isUsage,`setDetailTab('${p.id}','payment')`,'누적 결제',shortMoney(p.total_paid),'text-xs')}
+${detailStatCard(!isUsage,`setDetailTab('${p.id}','payment')`,'충전',p.total_sessions+'회')}
+${detailStatCard(isUsage,`setDetailTab('${p.id}','usage')`,'사용',p.used_sessions+'회')}
+<div class="bg-[#E8F3FF] rounded-2xl p-3 text-center"><p class="text-[10px] text-toss-blue mb-1">잔여</p><p class="text-sm font-bold text-toss-blue">${p.remaining_sessions}회</p></div></div>
+${p.memo?`<div class="toss-card bg-toss-bg shadow-none p-4 mb-5"><p class="text-xs text-toss-muted mb-1">메모</p><p class="text-sm whitespace-pre-wrap leading-relaxed">${esc(p.memo)}</p></div>`:''}
+<h3 class="font-bold mb-4">${isUsage?'사용 내역':'입금 내역'}</h3>
+<div class="relative timeline-line pl-6 mb-6">${timeline}</div>
+<button type="button" onclick="openSheet('payment','${p.id}')" class="btn-toss mb-2">선불 충전</button>
+<button type="button" onclick="openSheet('player','${p.id}')" class="btn-toss-secondary mb-2">정보 수정</button>
+<button type="button" onclick="closeSheet()" class="py-3 text-toss-muted text-sm w-full">닫기</button>`;
+}
+
+function completeLesson(id){
+const s=state.schedules.find(x=>x.id===id);if(!s||s.status!=='scheduled')return;
+const p=getPlayer(s.player_id);if(!p)return;
+if(p.remaining_sessions<=0){alert('잔여 회차가 없습니다.');openSheet('payment',p.id);return;}
+if(!confirm(p.name+'님 레슨을 완료하고 1회 차감할까요?'))return;
+p.used_sessions+=1;s.status='completed';saveState();render();
+}
+function cancelSchedule(id){const s=state.schedules.find(x=>x.id===id);if(s){s.status='canceled';saveState();render();}}
+function deletePlayer(id){if(!confirm('회원과 관련 일정이 삭제됩니다. 계속할까요?'))return;state.players=state.players.filter(p=>p.id!==id);state.schedules=state.schedules.filter(s=>s.player_id!==id);saveState();closeSheet();render();}
+function submitPlayer(e,id){
+e.preventDefault();
+const fd=new FormData(e.target);
+const gender=fd.get('gender')||'남성';
+const data={
+name:fd.get('name').trim(),
+phone:phone(fd.get('phone')),
+gender,
+birth_date:fd.get('birth_date'),
+affiliation:(fd.get('affiliation')||'').trim(),
+memo:(fd.get('memo')||'').trim()
+};
+if(id)Object.assign(getPlayer(id),data);
+else state.players.push({id:uid('p'),...data,payment_history:[],used_sessions:0});
+saveState();closeSheet();render();
+}
+function submitPayment(e,pid){e.preventDefault();const p=getPlayer(pid);if(!p)return;const fd=new FormData(e.target);
+if(!p.payment_history)p.payment_history=[];
+p.payment_history.push({date:fd.get('date'),amount:Number(fd.get('amount')),sessions:Number(fd.get('sessions'))});
+saveState();
+render();
+detailTab='payment';
+renderDetail(pid);
+}
+function submitSchedule(e){e.preventDefault();const fd=new FormData(e.target);state.schedules.push({id:uid('s'),date:fd.get('date'),time:String(fd.get('time')).slice(0,5),player_id:fd.get('player_id'),status:'scheduled'});
+selectedDate=fd.get('date');saveState();closeSheet();setView('calendar');}
+
+window.setView=setView;window.openSheet=openSheet;window.closeSheet=closeSheet;
+window.completeLesson=completeLesson;window.cancelSchedule=cancelSchedule;window.deletePlayer=deletePlayer;
+window.submitPlayer=submitPlayer;window.submitPayment=submitPayment;window.submitSchedule=submitSchedule;
+window.setCalMode=setCalMode;window.calNav=calNav;window.selectCalDay=selectCalDay;window.setDetailTab=setDetailTab;
+
+loadState();selectedDate=todayISO();setView('home');
+</script>
+</body>
+</html>
