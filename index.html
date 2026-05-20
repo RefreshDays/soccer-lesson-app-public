@@ -91,7 +91,16 @@ pointer-events:auto;
 #sheet.is-open{transform:translate(-50%,0)}
 #sheet.hidden{transform:translate(-50%,100%)}
 }
-body.sheet-open{overflow:hidden}
+body.sheet-open,body.confirm-open{overflow:hidden}
+#confirmBackdrop{display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.45);z-index:80;opacity:0;transition:opacity .22s ease}
+#confirmBackdrop.is-open{display:flex!important;opacity:1}
+#confirmDialog{width:100%;max-width:300px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.18);transform:scale(.94);opacity:0;transition:transform .25s cubic-bezier(.32,.72,0,1),opacity .22s ease}
+#confirmBackdrop.is-open #confirmDialog{transform:scale(1);opacity:1}
+#confirmMsg{margin:0;padding:28px 24px 24px;font-size:17px;font-weight:600;line-height:1.45;text-align:center;color:#191F28;letter-spacing:-.02em}
+.confirm-actions{display:flex;border-top:1px solid #F2F4F6}
+.confirm-actions button{flex:1;min-height:52px;font-size:16px;font-weight:600;border:0;background:transparent;cursor:pointer;font-family:inherit}
+.confirm-actions .confirm-cancel{color:#4E5968}
+.confirm-actions .confirm-ok{color:#3182F6;font-weight:700;border-left:1px solid #F2F4F6}
 .dash-brand{font-size:1.35rem;font-weight:800;color:#3182F6;letter-spacing:-.02em;line-height:1.2}
 .dash-subtitle{font-size:15px;font-weight:400;color:#191F28;line-height:1.4}
 .dash-greeting{font-size:14px;font-weight:400;color:#191F28;white-space:nowrap}
@@ -146,6 +155,15 @@ body.sheet-open{overflow:hidden}
 <button id="fab" type="button" class="fixed bottom-20 right-5 w-14 h-14 rounded-full bg-toss-blue text-white text-2xl shadow-toss-lg z-50 hidden items-center justify-center" aria-label="추가">+</button>
 <div id="sheetBackdrop" class="fixed inset-0 bg-black/40 z-[60] hidden" aria-hidden="true"></div>
 <div id="sheet" class="fixed inset-x-0 bottom-0 z-[70] w-full max-h-[min(92vh,900px)] overflow-y-auto overflow-x-hidden bg-white rounded-t-[24px] px-6 pt-5 pb-8 shadow-toss-lg hidden md:rounded-3xl" role="dialog" aria-modal="true"></div>
+<div id="confirmBackdrop" class="fixed inset-0 hidden" aria-hidden="true">
+<div id="confirmDialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmMsg">
+<p id="confirmMsg"></p>
+<div class="confirm-actions">
+<button type="button" id="confirmCancel" class="confirm-cancel">취소</button>
+<button type="button" id="confirmOk" class="confirm-ok">확인</button>
+</div>
+</div>
+</div>
 <script>
 const STORAGE_KEY='soccer-lesson-app-v4';
 const DATA_VERSION=4;
@@ -424,7 +442,7 @@ ${renderMemberTrendChart(active,newly)}
 </div>
 
 <div class="toss-card p-5 dash-anim">
-<p class="text-sm font-semibold text-toss-text mb-1">월별 레슨 차감 현황</p>
+<p class="text-sm font-semibold text-toss-text mb-1">월별 레슨 현황</p>
 <p class="text-xs text-toss-muted mb-5">최근 4개월 완료 레슨</p>
 <div class="flex items-end justify-between gap-2 h-36 px-1">
 ${monthly.map((m,i)=>{
@@ -815,22 +833,40 @@ ${p.memo?`<div class="toss-card bg-toss-bg shadow-none p-4 mb-5"><p class="text-
 <button type="button" onclick="closeSheet()" class="py-3 text-toss-muted text-sm w-full">닫기</button>`;
 }
 
-function completeLesson(id){
+let confirmResolve=null;
+function showConfirm(message,opts={}){
+return new Promise(resolve=>{
+confirmResolve=resolve;
+document.getElementById('confirmMsg').textContent=message;
+document.getElementById('confirmOk').textContent=opts.ok||'확인';
+document.getElementById('confirmCancel').textContent=opts.cancel||'취소';
+document.getElementById('confirmBackdrop').classList.add('is-open');
+document.getElementById('confirmBackdrop').setAttribute('aria-hidden','false');
+document.body.classList.add('confirm-open');
+});
+}
+function closeConfirm(ok){
+document.getElementById('confirmBackdrop').classList.remove('is-open');
+document.getElementById('confirmBackdrop').setAttribute('aria-hidden','true');
+document.body.classList.remove('confirm-open');
+if(confirmResolve){const r=confirmResolve;confirmResolve=null;r(!!ok);}
+}
+async function completeLesson(id){
 const s=state.schedules.find(x=>x.id===id);if(!s||s.status!=='scheduled')return;
 const p=getPlayer(s.player_id);if(!p)return;
 if(p.remaining_sessions<=0){alert('잔여 회차가 없습니다.');openSheet('payment',p.id);return;}
-if(!confirm(p.name+'님 레슨을 완료하고 1회 차감할까요?'))return;
+if(!await showConfirm(p.name+'님 레슨을 완료하고 1회 차감할까요?'))return;
 p.used_sessions+=1;s.status='completed';saveState();render();
 }
-function cancelSchedule(id){
+async function cancelSchedule(id){
 const s=state.schedules.find(x=>x.id===id);
 if(!s||s.status!=='scheduled')return;
-if(!confirm('이 일정을 취소할까요?'))return;
+if(!await showConfirm('이 일정을 취소할까요?'))return;
 s.status='canceled';
 saveState();
 render();
 }
-function deletePlayer(id){if(!confirm('회원과 관련 일정이 삭제됩니다. 계속할까요?'))return;state.players=state.players.filter(p=>p.id!==id);state.schedules=state.schedules.filter(s=>s.player_id!==id);saveState();closeSheet();render();}
+async function deletePlayer(id){if(!await showConfirm('회원과 관련 일정이 삭제됩니다. 계속할까요?'))return;state.players=state.players.filter(p=>p.id!==id);state.schedules=state.schedules.filter(s=>s.player_id!==id);saveState();closeSheet();render();}
 function submitPlayer(e,id){
 e.preventDefault();
 const fd=new FormData(e.target);
@@ -874,6 +910,10 @@ window.setView=setView;window.openSheet=openSheet;window.closeSheet=closeSheet;
 window.completeLesson=completeLesson;window.cancelSchedule=cancelSchedule;window.deletePlayer=deletePlayer;
 window.submitPlayer=submitPlayer;window.submitPayment=submitPayment;window.submitSchedule=submitSchedule;
 window.setCalMode=setCalMode;window.calNav=calNav;window.selectCalDay=selectCalDay;window.setDetailTab=setDetailTab;
+
+document.getElementById('confirmCancel').onclick=()=>closeConfirm(false);
+document.getElementById('confirmOk').onclick=()=>closeConfirm(true);
+document.getElementById('confirmBackdrop').onclick=e=>{if(e.target.id==='confirmBackdrop')closeConfirm(false);};
 
 loadState();selectedDate=todayISO();setView('home');
 </script>
