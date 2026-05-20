@@ -32,10 +32,14 @@ body{background:#F2F4F6;color:#191F28;-webkit-tap-highlight-color:transparent}
 .nav-btn .nav-label{font-size:11px;line-height:1;font-weight:500;letter-spacing:-.02em}
 .nav-btn.nav-active{color:#3182F6}
 .nav-btn.nav-active .nav-label{font-weight:700}
-.cal-day{min-height:84px;min-width:0;border-radius:12px}
+.cal-day{min-height:92px;min-width:0;border-radius:12px;display:flex;flex-direction:column;align-items:stretch;padding:6px 2px 4px!important}
 .cal-day.selected{background:#E8F3FF}
-.cal-num{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;font-size:14px;font-weight:600}
+.cal-day-top{height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cal-day-events{min-height:44px;display:flex;flex-direction:column;gap:2px;justify-content:flex-start;width:100%}
+.cal-num{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0}
 .cal-num.today{background:#3182F6;color:#fff;border-radius:9999px}
+.cal-event{display:block;width:100%;text-align:center;font-size:10px;line-height:1.15;padding:2px 1px;border-radius:4px;font-weight:600;letter-spacing:-.02em}
+.cal-event-more{font-size:9px;text-align:center;color:#8B95A1;font-weight:600;line-height:1.2}
 .timeline-line::before{content:'';position:absolute;left:7px;top:22px;bottom:0;width:2px;background:#E5E8EB}
 #sheetBackdrop{opacity:0;transition:opacity .25s ease}
 #sheetBackdrop.is-open{display:block!important;opacity:1}
@@ -497,15 +501,20 @@ while(days.length<42){const d=new Date(y,m+1,days.length-first.getDay()-last.get
 return days;
 }
 
+function calEventLabel(name){
+const n=(name||'?').trim();
+return n.length<=3?n:n.slice(0,3);
+}
 function renderCalGrid(){
 const today=todayISO();
 document.getElementById('calGrid').innerHTML=calDays().map(({date,outside})=>{
 const iso=fmtISO(date),scheds=onDate(iso).filter(s=>s.status!=='canceled'),sel=selectedDate===iso,isT=today===iso;
 const tags=scheds.slice(0,2).map(s=>{const p=getPlayer(s.player_id),done=s.status==='completed';
-return`<span class="block truncate text-[9px] px-1 py-0.5 rounded font-medium ${done?'bg-gray-200 text-toss-muted':'bg-[#E8F3FF] text-toss-blue'}">${esc((p?.name||'?').slice(0,4))}</span>`;}).join('');
-const more=scheds.length>2?`<span class="text-[9px] text-toss-muted">+${scheds.length-2}</span>`:'';
-return`<button type="button" onclick="selectCalDay('${iso}')" class="cal-day p-1 text-left w-full ${sel?'selected ring-2 ring-toss-blue':''} ${outside?'opacity-40':''} hover:bg-toss-bg">
-<span class="cal-num ${isT?'today':''}">${date.getDate()}</span><div class="space-y-0.5 mt-0.5">${tags}${more}</div></button>`;}).join('');
+return`<span class="cal-event ${done?'bg-gray-200 text-toss-muted':'bg-[#E8F3FF] text-toss-blue'}" title="${esc(p?.name||'')}">${esc(calEventLabel(p?.name))}</span>`;}).join('');
+const more=scheds.length>2?`<span class="cal-event-more">+${scheds.length-2}명</span>`:'';
+return`<button type="button" onclick="selectCalDay('${iso}')" class="cal-day w-full text-left ${sel?'selected ring-2 ring-toss-blue':''} ${outside?'opacity-40':''} hover:bg-toss-bg">
+<div class="cal-day-top"><span class="cal-num ${isT?'today':''}">${date.getDate()}</span></div>
+<div class="cal-day-events">${tags}${more}</div></button>`;}).join('');
 }
 
 function selectCalDay(iso){selectedDate=iso;renderCalGrid();renderDayPanel(iso);}
