@@ -380,8 +380,19 @@ firebaseReady=true;
 return true;
 }
 function cloudDocRef(uid){return firebase.firestore().doc('users/'+uid+'/app/state');}
-function buildPayload(){
+function cloudProfileRef(uid){return firebase.firestore().doc('users/'+uid);}
+function buildAppPayload(){
 return{_version:DATA_VERSION,players:state.players,schedules:state.schedules,updatedAt:Date.now()};
+}
+function buildCloudPayload(user){
+const base=buildAppPayload();
+return{
+...base,
+ownerEmail:user?.email||'',
+ownerUid:user?.uid||'',
+memberCount:state.players.length,
+scheduleCount:state.schedules.length
+};
 }
 function applyPayload(parsed){
 if(!parsed||!Array.isArray(parsed.players))return false;
@@ -393,11 +404,12 @@ purgeOrphanSchedules();
 return true;
 }
 function saveStateLocal(payload){
-const data=payload||buildPayload();
+const data=payload||buildAppPayload();
+const local={_version:data._version,players:data.players,schedules:data.schedules,updatedAt:data.updatedAt||Date.now()};
 try{
-localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
-state.players=data.players;
-state.schedules=data.schedules;
+localStorage.setItem(STORAGE_KEY,JSON.stringify(local));
+state.players=local.players;
+state.schedules=local.schedules;
 state._version=DATA_VERSION;
 return true;
 }catch(e){
@@ -436,11 +448,28 @@ document.body.classList.remove('auth-lock');
 if(gate){gate.classList.add('hidden');gate.setAttribute('aria-hidden','true');}
 if(err)err.classList.add('hidden');
 }
+async function saveProfileToCloud(uid,user){
+if(!firebaseReady||!uid||!user)return;
+const ref=cloudProfileRef(uid);
+const snap=await ref.get();
+const profile={
+email:user.email||'',
+ownerUid:uid,
+updatedAt:Date.now(),
+memberCount:state.players.length,
+scheduleCount:state.schedules.length,
+app:'레슨 매니저'
+};
+if(!snap.exists)profile.createdAt=Date.now();
+await ref.set(profile,{merge:true});
+}
 async function saveStateToCloud(uid){
 if(!firebaseReady||!uid)return;
-const payload=buildPayload();
+const user=firebase.auth().currentUser;
+const payload=buildCloudPayload(user||{uid,email:''});
 lastCloudPush=payload.updatedAt;
 await cloudDocRef(uid).set(payload);
+await saveProfileToCloud(uid,user);
 saveStateLocal(payload);
 }
 function scheduleCloudSave(){
