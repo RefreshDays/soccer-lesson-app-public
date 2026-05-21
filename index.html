@@ -58,10 +58,8 @@ background-size:20px;
 .chart-dot.is-in{opacity:1;transform:scale(1)}
 .chart-bar-label{opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease}
 .chart-bar-label.is-in{opacity:1;transform:translateY(0)}
-.chart-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;min-height:20px;padding-right:var(--chart-side-inset,0)}
-.chart-card-subhead{padding-right:var(--chart-side-inset,0)}
-.chart-card-title{font-size:14px;font-weight:600;color:#191F28;line-height:1.35;flex-shrink:0;margin:0}
-.chart-card-desc{font-size:10px;color:#8B95A1;line-height:1.35;text-align:right;flex:1;min-width:0;word-break:keep-all;margin:0}
+.chart-card-head{margin-bottom:6px}
+.chart-card-title{font-size:14px;font-weight:600;color:#191F28;line-height:1.35;margin:0}
 .chart-card-plot{margin-top:8px}
 .chart-bar-chart{margin-top:10px}
 .chart-bar-track{width:100%;display:flex;align-items:flex-end;justify-content:center;height:5rem}
@@ -587,12 +585,9 @@ return`
 <section class="space-y-4 dash-charts">
 <h2 class="text-lg font-bold dash-anim">통계 분석</h2>
 
-<div class="toss-card p-4 dash-anim chart-card" style="--chart-side-inset:4%">
-<div class="chart-card-head">
-<p class="chart-card-title">월별 회원 추이</p>
-<p class="chart-card-desc">유지: 잔여 1회 이상 · 신규: 첫 결제 월 · 최근 6개월</p>
-</div>
-<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-1 chart-card-subhead">
+<div class="toss-card p-4 dash-anim">
+<div class="chart-card-head"><p class="chart-card-title">월별 회원 추이</p></div>
+<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-1">
 <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
 <p class="text-lg font-bold leading-tight"><span class="text-toss-blue">유지</span> <span class="text-toss-text dash-count" data-count="${currentActive}">0</span><span class="text-sm font-medium text-toss-muted ml-0.5">명</span></p>
 <p class="text-lg font-bold leading-tight"><span style="color:${CHART_NEW}">신규</span> <span class="text-toss-text dash-count-new" data-count="${currentNew}">0</span><span class="text-sm font-medium text-toss-muted ml-0.5">명</span></p>
@@ -605,11 +600,8 @@ return`
 <div class="chart-card-plot">${renderMemberTrendChart(active,newly)}</div>
 </div>
 
-<div class="toss-card p-4 dash-anim chart-card" style="--chart-side-inset:4%">
-<div class="chart-card-head">
-<p class="chart-card-title">월별 레슨 현황</p>
-<p class="chart-card-desc">최근 4개월 완료 레슨</p>
-</div>
+<div class="toss-card p-4 dash-anim">
+<div class="chart-card-head"><p class="chart-card-title">월별 레슨 현황</p></div>
 <div class="chart-card-plot chart-bar-chart">
 <div class="flex items-end justify-between gap-2">
 ${monthly.map((m,i)=>{
