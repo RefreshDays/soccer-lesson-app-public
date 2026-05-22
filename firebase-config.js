@@ -1,9 +1,9 @@
-// lesson-manager-bf3cf 웹 앱 설정
+// soccer-lesson-app-public 웹 앱 설정
 window.FIREBASE_CONFIG = {
-  apiKey: 'AIzaSyCqO4ONo40c4jNAFCzFMVkUWotIjVdoaiM',
-  authDomain: 'lesson-manager-bf3cf.firebaseapp.com',
-  projectId: 'lesson-manager-bf3cf',
-  storageBucket: 'lesson-manager-bf3cf.firebasestorage.app',
-  messagingSenderId: '1068618578828',
-  appId: '1:1068618578828:web:1919b220786d589b13b4a9'
+  apiKey: 'AIzaSyDw3B7X4WY8kyUg61HOZNuLbZmOPXc0_fI',
+  authDomain: 'soccer-lesson-app-public.firebaseapp.com',
+  projectId: 'soccer-lesson-app-public',
+  storageBucket: 'soccer-lesson-app-public.firebasestorage.app',
+  messagingSenderId: '133769139294',
+  appId: '1:133769139294:web:f3d7f36d46487cddc7d0cf'
 };
